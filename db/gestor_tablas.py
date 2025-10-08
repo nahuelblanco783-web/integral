@@ -27,12 +27,13 @@ class GestorTablas:
                         email TEXT NOT NULL,
                         telefono TEXT NOT NULL,
                         direccion TEXT NOT NULL,
-                        rol_base TEXT NOT NULL CHECK(rol_base IN ('tecnico', 'secretario', 'administrador')),
                         zona_trabajo TEXT NOT NULL,
                         fecha_ingreso DATE NOT NULL,
                         estado TEXT NOT NULL CHECK(estado IN ('activo', 'suspendido', 'baja')),
                         ultimo_acceso DATETIME,
-                        contrasena TEXT NOT NULL
+                        contrasena TEXT NOT NULL,
+                        id_rol_base INTEGER NOT NULL,
+                        FOREIGN KEY (id_rol_base) REFERENCES rol_base(id_rol_base)
                     )
                 """,
                 "planes_servicio": """
@@ -45,19 +46,15 @@ class GestorTablas:
                         tipo_conexion TEXT NOT NULL CHECK(tipo_conexion IN ('fibra', 'inalambrico', 'satelital'))
                     )
                 """,
-                "permisos": """
-                    CREATE TABLE IF NOT EXISTS permisos (
-                        id_permiso INTEGER PRIMARY KEY AUTOINCREMENT,
-                        id_empleado INTEGER NOT NULL,
+                "rol_base": """
+                    CREATE TABLE IF NOT EXISTS rol_base (
+                        id_rol_base INTEGER PRIMARY KEY AUTOINCREMENT,
+                        nombre TEXT NOT NULL CHECK(nombre IN ('tecnico', 'secretario', 'administrador')),
                         gestion_clientes BOOLEAN NOT NULL DEFAULT 0,
-                        gestion_tickets BOOLEAN NOT NULL DEFAULT 0,
-                        gestion_equipos BOOLEAN NOT NULL DEFAULT 0,
-                        gestion_visitas BOOLEAN NOT NULL DEFAULT 0,
-                        gestion_notificaciones BOOLEAN NOT NULL DEFAULT 0,
-                        gestion_evaluacion_rendimiento BOOLEAN NOT NULL DEFAULT 0,
-                        gestion_reportes BOOLEAN NOT NULL DEFAULT 0,
-                        gestion_permisos BOOLEAN NOT NULL DEFAULT 0,
-                        FOREIGN KEY (id_empleado) REFERENCES empleado(id_empleado)
+                        gestion_soporte BOOLEAN NOT NULL DEFAULT 0,
+                        gestion_empleados BOOLEAN NOT NULL DEFAULT 0,
+                        gestion_pago BOOLEAN NOT NULL DEFAULT 0,
+                        gestion_equipos BOOLEAN NOT NULL DEFAULT 0
                     )
                 """,
                 "auditoria_accesos": """

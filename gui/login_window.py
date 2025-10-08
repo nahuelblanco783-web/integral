@@ -7,7 +7,7 @@ from CTkMessagebox import CTkMessagebox
 from db.gestor_campos import GestorCampos
 GestorCamposInstance = GestorCampos()
 
-class LoginWindow(ctk.CTk):
+class LoginWindow(ctk.CTkToplevel):
     """Ventana de logeo de empleados."""
 
     def __init__(self, fg_color: Optional[str | Tuple[str, str]] = None, **kwargs: Any) -> None:
@@ -17,6 +17,8 @@ class LoginWindow(ctk.CTk):
         self.root_width = int(self.winfo_screenwidth() / 1.5)
         self.root_height = int(self.winfo_screenheight() / 1.5)
         self.geometry(f"{self.root_width}x{self.root_height}")
+
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
 
         # Configurar grid principal 2 columnas iguales
         self.grid_columnconfigure(0, weight=1, uniform="a")
@@ -165,3 +167,8 @@ class LoginWindow(ctk.CTk):
                 icon="cancel"
             )
             return False
+    
+    def on_close(self):
+        self.destroy()    # destruye la ventana
+        import sys
+        sys.exit()

@@ -1,169 +1,74 @@
-from typing import Optional, Tuple, Any, List
+from gui.menu_frame import MenuFrame
+from gui.inicio_frame import InicioFrame
+from db.gestor_campos import GestorCampos
 import customtkinter as ctk
-from CTkSeparator import CTkSeparator
-from PIL import Image
+from CTkMessagebox import CTkMessagebox
+GestorCamposInstance = GestorCampos()
 
-class MainWindow(ctk.CTk):
-    """Ventana principal de la aplicación."""
-
-    def __init__(self, fg_color: Optional[str | Tuple[str, str]] = "white", user=List[Any], **kwargs: Any) -> None:
+class MainWindow(ctk.CTkToplevel):
+    def __init__(self, fg_color="white", user=None, **kwargs):
         super().__init__(fg_color=fg_color, **kwargs)
         self.user = user
+        self.permisos_user = GestorCamposInstance.read(
+            table='rol_base',
+            where={"id_rol_base": user[-1]}
+        )[0]
 
         self.after(0, lambda: self.state('zoomed'))
         self.title("Integral Comunicaciones")
-        self.root_width = int(self.winfo_screenwidth())
-        self.root_height = int(self.winfo_screenheight())
-        self.geometry(f"{self.root_width}x{self.root_height}")
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
 
-        print(user)
+        # --- Callbacks de navegación ---
+        callbacks = {
+            "inicio": self.show_inicio,
+            "clientes": self.show_clientes,
+            # "soporte": self.show_soporte,
+            # "empleados": self.show_empleados,
+            # "pago": self.show_pago,
+            # "equipos": self.show_equipos,
+            "log_out": self.log_out
+        }
 
-        self.create_menu()
+        self.menu = MenuFrame(self, user=self.user, permisos_user=self.permisos_user, callbacks=callbacks)
 
-    def create_menu(self) -> None:
-        """Crea la barra de menú."""
-        self.menu = ctk.CTkFrame(
-            self, 
-            width=self.root_width, 
-            height=50,
-            corner_radius=0,
-            fg_color="#242423")
-        self.menu.pack(side="top", fill="x")
+        # Aquí crearías los frames de contenido
+        self.current_frame = None
+        self.show_inicio()
 
+    def show_inicio(self):
+        self._show_frame(InicioFrame, user=self.user)
 
-        self.menu.grid_columnconfigure(9, weight=1) 
+    def show_clientes(self):
+        #self._show_frame(ClientesFrame)
+        pass
 
+    # ... métodos similares para soporte, empleados, etc.
 
-        self.inicio_button = ctk.CTkButton(
-            self.menu, 
-            text="INICIO",
-            height=35,
-            width=0,
-            fg_color="#242423",
-            hover_color="#4E4E4E",
-            text_color="white",
-            font=('Lato Light', 20),
-            corner_radius=0,
-            cursor="hand2",)
-        self.inicio_button.grid(row=0, column=0, padx=(25,0),pady=7)
+    def _show_frame(self, frame_class, *args, **kwargs):
+        if self.current_frame is not None:
+            self.current_frame.pack_forget()
+        self.current_frame = frame_class(self, *args, **kwargs)  # args van al constructor del frame
+        self.current_frame.pack(fill="both", expand=True)
 
-        CTkSeparator(
-            self.menu, 
-            orientation="vertical", 
-            length=35, 
-            fg_color="white",
-            line_weight=2
-        ).grid(row=0, column=1, padx=25)
-
-        self.clientes_button = ctk.CTkButton(
-            self.menu, 
-            text="CLIENTES",
-            height=35,
-            width=0,
-            fg_color="#242423",
-            hover_color="#4E4E4E",
-            text_color="white",
-            font=('Lato Light', 20),
-            corner_radius=0,
-            cursor="hand2",)
-        self.clientes_button.grid(row=0, column=2)
-
-        CTkSeparator(
-            self.menu, 
-            orientation="vertical", 
-            length=35, 
-            fg_color="white",
-            line_weight=2
-        ).grid(row=0, column=3, padx=25)
-
-        self.empleados_button = ctk.CTkButton(
-            self.menu, 
-            text="EMPLEADOS",
-            height=35,
-            width=0,
-            fg_color="#242423",
-            hover_color="#4E4E4E",
-            text_color="white",
-            font=('Lato Light', 20),
-            corner_radius=0,
-            cursor="hand2",)
-        self.empleados_button.grid(row=0, column=4)
-
-        CTkSeparator(
-            self.menu, 
-            orientation="vertical", 
-            length=35, 
-            fg_color="white",
-            line_weight=2
-        ).grid(row=0, column=5, padx=25)
-
-        self.soporte_button = ctk.CTkButton(
-            self.menu, 
-            text="SOPORTE",
-            height=35,
-            width=0,
-            fg_color="#242423",
-            hover_color="#4E4E4E",
-            text_color="white",
-            font=('Lato Light', 20),
-            corner_radius=0,
-            cursor="hand2",)
-        self.soporte_button.grid(row=0, column=6)
-
-        CTkSeparator(
-            self.menu, 
-            orientation="vertical", 
-            length=35, 
-            fg_color="white",
-            line_weight=2
-        ).grid(row=0, column=7, padx=25)
-
-        self.pago_button = ctk.CTkButton(
-            self.menu, 
-            text="PAGO",
-            height=35,
-            width=0,
-            fg_color="#242423",
-            hover_color="#4E4E4E",
-            text_color="white",
-            font=('Lato Light', 20),
-            corner_radius=0,
-            cursor="hand2",)
-        self.pago_button.grid(row=0, column=8)
-
-        self.account_button = ctk.CTkButton(
-            self.menu, 
-            text=str(self.user[2]).upper(),
-            height=35,
-            width=0,
-            fg_color="#242423",
-            hover_color="#4E4E4E",
-            text_color="white",
-            font=('Lato Light', 20),
-            corner_radius=0,
-            cursor="hand2",)
-        self.account_button.grid(row=0, column=9, sticky="e", padx=0)
-
-        self.log_out_image=ctk.CTkImage(
-            light_image=Image.open("gui\\images\\log_out.png"),
-            dark_image=Image.open("gui\\images\\log_out.png"),
-            size=(30,25)
+    def log_out(self):
+        confirmar_salir = CTkMessagebox(
+            master=self,
+            title='',
+            message='¿Deseas salir?',
+            option_1='Cancelar',
+            option_2='Salir',
+            icon='question'
         )
-        self.log_out_button = ctk.CTkButton(
-            self.menu, 
-            text="",
-            height=35,
-            width=0,
-            fg_color="#242423",
-            hover_color="#4E4E4E",
-            text_color="white",
-            font=('Lato Light', 20),
-            corner_radius=0,
-            cursor="hand2",
-            image=self.log_out_image,)
-        self.log_out_button.grid(row=0, column=10, padx=25)
 
+        if confirmar_salir.get() == 'Salir':
+            self.destroy()  # Cierra solo esta ventana
 
-if __name__ == "__main__":
-    app = MainWindow(user=(1, '12345678', 'juan perez', 'juanperez@gmail.com', '123456', 'pisculichi 34', 'secretario', 'Secretaria', '2020-06-23', 'activo', 0, 'hola123'))
-    app.mainloop()
+            # Abrir nuevamente LoginWindow usando la misma raíz
+            from gui.login_window import LoginWindow
+            login_app = LoginWindow(master=self.master)
+            login_app.focus()
+
+    def on_close(self):
+        self.destroy()    # destruye la ventana
+        import sys
+        sys.exit()
