@@ -1,5 +1,5 @@
 from typing import Any
-from gestores_db.db_utils import conexion_cursor
+from db.db_utils import conexion_cursor
 
 class GestorCampos:
     def __init__(self, nombre_bd: str = "BBDDAVE.db") -> None:

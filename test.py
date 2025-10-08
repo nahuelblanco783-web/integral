@@ -1,11 +1,11 @@
-from gestores_db.gestor_tablas import GestorTablas
-from gestores_db.gestor_campos import GestorCampos
+from db.gestor_tablas import GestorTablas
+from db.gestor_campos import GestorCampos
 
 gt_tablas = GestorTablas()
 gt_campos = GestorCampos()
 
-# Crear tablas
-# gt_tablas.create_tables()
+#Crear tablas
+gt_tablas.create_tables()
 
 
 
@@ -23,16 +23,19 @@ gt_campos = GestorCampos()
 #     ]
 # )
 
-gt_campos.update(
-    table="cliente",
+gt_campos.create(
+    table="empleado",
     values=[
-        "1234445368",
-        "jua3n perez",
-        "juan43p564e3rez@gmail.com",
+        "12345678",
+        "juan perez",
+        "juanperez@gmail.com",
         "123456",
         "pisculichi 34",
+        'secretario',
+        "Secretaria",
         "2020-06-23",
         "activo",
-        4
+        "0",
+        "hola123"
     ]
 )

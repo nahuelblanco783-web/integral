@@ -1,4 +1,4 @@
-from gestores_db.db_utils import conexion_cursor
+from db.db_utils import conexion_cursor
 
 class GestorTablas:
     def __init__(self, nombre_bd: str = "BBDDAVE.db") -> None:
@@ -31,7 +31,8 @@ class GestorTablas:
                         zona_trabajo TEXT NOT NULL,
                         fecha_ingreso DATE NOT NULL,
                         estado TEXT NOT NULL CHECK(estado IN ('activo', 'suspendido', 'baja')),
-                        ultimo_acceso DATETIME
+                        ultimo_acceso DATETIME,
+                        contrasena TEXT NOT NULL
                     )
                 """,
                 "planes_servicio": """

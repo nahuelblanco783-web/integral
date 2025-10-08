@@ -1,5 +1,4 @@
-from gui.login_window import LoginWindow # pyright: ignore[reportUnknownVariableType, reportAttributeAccessIssue]
-
+from gui.login_window import LoginWindow 
 if __name__ == "__main__":
-    app = LoginWindow() # pyright: ignore[reportUnknownVariableType]
-    app.mainloop() # pyright: ignore[reportUnknownMemberType]
+    app = LoginWindow() 
+    app.mainloop()
