@@ -14,7 +14,7 @@ class ClientesFrame(ctk.CTkFrame):
         self.user = user
         self.configure(corner_radius=0, border_width=0, fg_color='#D9D9D9')
         self.pack(fill='both', expand=True)
-    
+
         # ---[ Sub Menu ]---
         self.columnconfigure(0, weight=1)
         self.sub_menu = ctk.CTkFrame(
@@ -52,10 +52,10 @@ class ClientesFrame(ctk.CTkFrame):
             fg_color='#D9D9D9',
             hover_color='#BFBFBF',
             text_color='white',
-            command=lambda: print('nuevo cliente')
+            command=self.nuevo_cliente
         )
         self.sub_menu.nuevo_cliente_button.grid(row=0, column=2, padx=(0, 25), pady=5, sticky='e')
-        
+
         # ---[ Content Frame ]---
         self.rowconfigure(1, weight=1)
         self.content_frame = CTkXYFrame(
@@ -103,7 +103,6 @@ class ClientesFrame(ctk.CTkFrame):
             entry.grid(row=0, column=i, padx=padx, pady=0)
             self.entries[campo] = entry
 
-            # 👇 Vinculamos evento: cuando cambia el texto, actualiza la tabla
             entry.bind("<KeyRelease>", self.filtrar_tabla)
 
         # ---[ Tabla de datos ]---
@@ -120,12 +119,15 @@ class ClientesFrame(ctk.CTkFrame):
             table='cliente',
             where={}
         )
-        self.values_clientes = [t[1:] for t in self.values_clientes]
+        self.values_clientes = [list(t[1:]) for t in self.values_clientes]
         self.rows_clientes = len(self.values_clientes)
         self.columns_clientes = len(self.campos_cliente) - 1
 
-        # Guardamos los datos originales para filtrar sin tocar la fuente
-        self._datos_originales = list(self.values_clientes)
+        self._datos_originales = [list(fila) for fila in self.values_clientes]
+        self._datos_filtrados = [list(fila) for fila in self.values_clientes]
+
+        self._fila_popup_actual = None
+        self._datos_fila_popup = None
 
         self.content_frame.table_frame.table = CTkTable(
             master=self.content_frame.table_frame,
@@ -143,12 +145,7 @@ class ClientesFrame(ctk.CTkFrame):
         )
         self.content_frame.table_frame.table.grid(row=0, column=0, sticky='nsew')
 
-        def do_popup(event, frame):
-            """ open the popup menu """
-            try: frame.popup(event.x_root, event.y_root)
-            finally: frame.grab_release()
-
-        self.content_frame.table_frame.table.bind("<Button-3>", lambda event: do_popup(event, self.popup_menu))
+        self.content_frame.table_frame.table.bind("<Button-3>", self._mostrar_popup_menu)
 
         # --- [ Popup Menu ] ---
         self.popup_menu = CTkFloatingWindow(self)
@@ -160,9 +157,10 @@ class ClientesFrame(ctk.CTkFrame):
             text_color='black',
             corner_radius=0,
             hover_color='white',
-            command=lambda: print("Modificar cliente")
+            command=self._on_modificar_cliente
         )
         self.popup_menu.modificar_button.pack()
+
         self.popup_menu.dar_de_baja_button = ctk.CTkButton(
             master=self.popup_menu.frame,
             text="Dar de baja",
@@ -170,20 +168,16 @@ class ClientesFrame(ctk.CTkFrame):
             text_color='black',
             corner_radius=0,
             hover_color='white',
-            command=lambda: print("Dar de baja cliente")
+            command=self._on_dar_de_baja_cliente
         )
         self.popup_menu.dar_de_baja_button.pack()
-
-
 
     # ---[ Método de filtrado dinámico ]---
     def filtrar_tabla(self, event=None):
         """Filtra la tabla después de un pequeño retardo (debounce)."""
-        # Cancelar un filtro anterior en curso (si el usuario sigue escribiendo)
         if hasattr(self, "_filtro_timer") and self._filtro_timer.is_alive():
             self._filtro_timer.cancel()
 
-        # Programar el filtrado real después de 250 ms
         self._filtro_timer = threading.Timer(0.25, self._ejecutar_filtrado)
         self._filtro_timer.start()
 
@@ -195,27 +189,32 @@ class ClientesFrame(ctk.CTkFrame):
             datos_filtrados = self._datos_originales
         else:
             datos_filtrados = []
-            for fila in self._datos_originales:
-                coincide = True
-                for valor, filtro in zip(fila, filtros):
-                    if filtro and not str(valor).lower().startswith(filtro):
-                        coincide = False
-                        break
-                if coincide:
-                    datos_filtrados.append(fila)
+        for fila in self._datos_originales:
+            coincide = True
+        for valor, filtro in zip(fila, filtros):
+            if filtro and not str(valor).lower().startswith(filtro):
+                coincide = False
+                break
+            if coincide:
+                datos_filtrados.append(fila)
 
         # Actualizar tabla en el hilo principal (Tkinter no permite hacerlo desde otro)
         self.after(0, lambda: self.actualizar_tabla(datos_filtrados))
 
-    def actualizar_tabla(self, nuevos_datos):
-        """Actualiza los valores de la tabla sin recrearla, limpiando las filas sobrantes."""
-        filas_max = len(self._datos_originales)
-        filas_actuales = len(nuevos_datos)
+        def actualizar_tabla(self, nuevos_datos):
+            """Actualiza los valores de la tabla sin recrearla, limpiando las filas sobrantes."""
+            filas_max = len(self._datos_originales)
+            filas_actuales = len(nuevos_datos)
 
-        # Si hay menos filas, rellena con vacías para evitar errores visuales
-        if filas_actuales < filas_max:
-            nuevos_datos = nuevos_datos + [[""] * self.columns_clientes for _ in range(filas_max - filas_actuales)]
+            # Si hay menos filas, rellena con vacías para evitar errores visuales
+            if filas_actuales < filas_max:
+                nuevos_datos = nuevos_datos + [[""] * self.columns_clientes for _ in range(filas_max - filas_actuales)]
 
-        # Actualiza solo los valores visibles
-        self.content_frame.table_frame.table.update_values(nuevos_datos)
-   
+            # Actualiza solo los valores visibles
+            self.content_frame.table_frame.table.update_values(nuevos_datos)
+    
+        def nuevo_cliente(self):
+            from gui.nuevo_cliente_window import NuevoCliente
+            
+            nuevo_cliente = NuevoCliente()
+            nuevo_cliente.mainloop()

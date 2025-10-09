@@ -29,6 +29,10 @@ class Root(ctk.CTk):
         self.geometry(f"{self.root_width}x{self.root_height}")
 
         self.main_frame: ctk.CTkFrame | None = None
+        
+        self._datos_originales = list(self.values_clientes)
+        self._datos_visibles = list(self.values_clientes)
+        self._fila_contextual = None
 
         self._create_menu()
         self._create_main_frame()
