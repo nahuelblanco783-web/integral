@@ -11,8 +11,8 @@ class MenuFrame(ctk.CTkFrame):
         self.permisos_user = permisos_user
         self.callbacks = callbacks  # Diccionario de funciones para cada botón
 
-        self.configure(height=50, fg_color="#242423", corner_radius=0)
-        self.pack(side="top", fill="x")
+        self.configure(height=50, fg_color="#242423", corner_radius=0, border_width=0)
+        self.pack(side="top", fill="x", padx=0, pady=0)
 
         # --- Definición de botones ---
         self.inicio_button = ctk.CTkButton(

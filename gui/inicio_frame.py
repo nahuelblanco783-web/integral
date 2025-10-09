@@ -1,5 +1,4 @@
 import customtkinter as ctk
-from CTkSeparator import CTkSeparator
 from PIL import Image
 
 class InicioFrame(ctk.CTkFrame):
@@ -13,7 +12,7 @@ class InicioFrame(ctk.CTkFrame):
         integral_image = ctk.CTkImage(
             light_image=Image.open("gui\\images\\integral.png"),
             dark_image=Image.open("gui\\images\\integral.png"),
-            size=(300, 500)
+            size=(300, 475)
         )
         
         ctk.CTkLabel(
@@ -28,3 +27,4 @@ class InicioFrame(ctk.CTkFrame):
             text_color='black',
             font=('Lato Light', 32)
         ).pack(pady=(25,0))
+

@@ -102,3 +102,18 @@ class GestorCampos:
         except Exception as e:
             print(f"Error al eliminar de {table}: {e}")
             return False
+
+    # --- Métodos específicos para campos ---
+    def get_campos(self, table: str) -> list[str]:
+        sql_query = f"SELECT name FROM pragma_table_info('{table}')"
+        try:
+            with conexion_cursor(self.nombre_bd) as (_conn, cursor):
+                cursor.execute(sql_query)
+                campos = [row[0] for row in cursor.fetchall()]
+                # Transformar: "_" → " " y Primera letra mayúscula
+                campos_formateados = [campo.replace("_", " ").title() for campo in campos]
+                return campos_formateados
+        except Exception as e:
+            print(f"Error al obtener campos de {table}: {e}")
+            return []
+        

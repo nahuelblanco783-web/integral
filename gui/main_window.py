@@ -1,5 +1,6 @@
 from gui.menu_frame import MenuFrame
 from gui.inicio_frame import InicioFrame
+from gui.clientes_frame import ClientesFrame
 from db.gestor_campos import GestorCampos
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
@@ -39,8 +40,7 @@ class MainWindow(ctk.CTkToplevel):
         self._show_frame(InicioFrame, user=self.user)
 
     def show_clientes(self):
-        #self._show_frame(ClientesFrame)
-        pass
+        self._show_frame(ClientesFrame, user=self.user)
 
     # ... métodos similares para soporte, empleados, etc.
 
