@@ -1,65 +1,27 @@
-from db.gestor_tablas import GestorTablas
-from db.gestor_campos import GestorCampos
+import customtkinter as ctk
+from CTkTable import CTkTable
 
-gt_tablas = GestorTablas()
-gt_campos = GestorCampos()
-print(
-gt_campos.get_campos("cliente"))
-#Crear tablas
-# gt_tablas.create_tables()
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
 
-# # Crear campos
-# gt_campos.create(
-#     table="rol_base",
-#     values=[
-#         "administrador",
-#         1,
-#         1,
-#         1,
-#         1,
-#         1
-#     ]
-# )
+root = ctk.CTk()
+root.geometry("600x400")
+root.title("CTkTable - Selección de fila")
 
-# gt_campos.create(
-#     table='empleado',
-#     values=[
-#         "admin",
-#         "Mc Gregor",
-#         "admin@gmail.com",
-#         "123456",
-#         "pisculichi 34",
-#         "secretaria",
-#         "2020-05-05",
-#         "activo",
-#         "0",
-#         "0",
-#         2
-#     ]
-#  )
+data = [
+    ["ID", "Nombre", "Edad", "País"],
+    ["1", "Ana", "25", "España"],
+    ["2", "Luis", "30", "México"],
+    ["3", "Sofía", "27", "Argentina"],
+    ["4", "Carlos", "35", "Chile"],
+]
 
-nombres = ["Maxi", "Ana", "Juan", "Lucía", "Pedro", "Carla", "Sofía", "Matías", "Laura", "Nicolás",
-           "Paula", "Mariano", "Agustina", "Gonzalo", "Camila", "Julián", "Rocío", "Valentín", "Brenda", "Ezequiel"]
+def fila_seleccionada(info):
+    print(info)  # Primero imprimimos todo para ver la estructura
 
+    print(table.get_row(info["row"]))
 
-for i in range(1, 41):
-    dni = str(10000000 + i * 123)  # Ejemplo simple de DNI diferente
-    nombre = nombres[i % len(nombres)]
-    email = f"{nombre.lower()}{i}@gmail.com"
-    telefono = '12'
-    direccion = '123'
-    fecha_alta = '2023-10-10'
-    estado = 'activo'
+table = CTkTable(master=root, values=data, command=fila_seleccionada)
+table.pack(padx=20, pady=20, expand=True, fill="both")
 
-    gt_campos.create(
-        table="cliente",
-        values=[
-            dni,
-            nombre,
-            email,
-            telefono,
-            direccion,
-            fecha_alta,
-            estado,
-        ]
-    )
+root.mainloop()

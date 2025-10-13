@@ -72,6 +72,8 @@ class LoginWindow(ctk.CTkToplevel):
             fg_color='#55473E'
         )
         self.dni_entry.grid(row=3, column=0, padx=25, pady=(5, 0), sticky="we")
+        self.dni_entry.bind("<Return>", lambda event: self.contrasena_entry.focus_set())
+        self.dni_entry.bind("<Down>", lambda event: self.contrasena_entry.focus_set())
 
         ctk.CTkLabel(
             master=self.login_frame,
@@ -91,6 +93,8 @@ class LoginWindow(ctk.CTkToplevel):
             show='*'  # opcional: oculta contraseña
         )
         self.contrasena_entry.grid(row=5, column=0, padx=25, pady=(5, 0), sticky="we")
+        self.contrasena_entry.bind("<Return>", lambda event: self.verify_login())
+        self.contrasena_entry.bind("<Up>", lambda event: self.dni_entry.focus_set())
 
         self.sign_up_button = ctk.CTkButton(
             master=self.login_frame,
