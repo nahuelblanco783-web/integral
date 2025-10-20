@@ -1,6 +1,10 @@
 import customtkinter as ctk
-from db.gestor_campos import GestorCampos
 from CTkMessagebox import CTkMessagebox
+
+from db.gestor_campos import GestorCampos
+
+from datetime import datetime
+
 GestorCamposInstance = GestorCampos()
 
 class NuevoCliente(ctk.CTkToplevel):
@@ -93,18 +97,33 @@ class NuevoCliente(ctk.CTkToplevel):
         self.aceptar_boton.grid(row=2, column=1, padx=(25,50), pady=(0, 50))
     
     def aceptar_cliente(self):
+        fecha_actual = datetime.now().strftime("%Y-%m-%d")
+
+        self.datos_cliente = [
+            self.dni_entry.get(),
+            self.nombre_entry.get(),
+            self.email_entry.get(),
+            self.telefono_entry.get(),
+            self.direccion_entry.get(),
+            fecha_actual,
+            'activo'
+        ]
+
+        for i in range(len(self.datos_cliente)):
+            if not self.datos_cliente[i]:
+                CTkMessagebox(
+                    master=self,
+                    title='Error',
+                    message='No pueden haber campos vacíos, vuelva a ingresar',
+                    option_1='Aceptar'
+                )
+                break
+
         bandera_cliente=GestorCamposInstance.create(
             'cliente',
-            [
-                self.dni_entry.get(),
-                self.nombre_entry.get(),
-                self.email_entry.get(),
-                self.telefono_entry.get(),
-                self.direccion_entry.get(),
-                "date('now')",
-                'activo'
-            ]
+            values=self.datos_cliente
         )
+        
         if bandera_cliente:
             self.cliente_aceptado_aviso=CTkMessagebox(
                 master=self,

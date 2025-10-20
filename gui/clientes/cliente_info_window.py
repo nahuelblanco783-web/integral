@@ -1,14 +1,16 @@
 import customtkinter as ctk
 from db.gestor_campos import GestorCampos
-from typing import List
+from CTkMessagebox import CTkMessagebox
 ctk.set_appearance_mode("light")
 
 class InfoCliente(ctk.CTkToplevel):
     """ Toplevel para mostrar toda la información del cliente y las acciones posibles (modificar, dar de baja y/o ver cuenta)"""
     
-    def __init__(self, fg_color="white", cliente=None, **kwargs):
+    def __init__(self, fg_color="white", cliente=None, row_cliente=None, table=None, **kwargs):
         super().__init__(fg_color=fg_color, **kwargs)
         self.cliente = cliente
+        self.row_cliente = row_cliente
+        self.table = table
     
         self.attributes('-topmost', True)
         
@@ -19,7 +21,13 @@ class InfoCliente(ctk.CTkToplevel):
         #Instancias y variables
         self.gestor_campos = GestorCampos()
         self.campos_cliente = self.gestor_campos.get_campos("cliente")
-        print(self.campos_cliente)
+        
+        #Obtener id del cliente
+        self.id_cliente = self.gestor_campos.read(
+            'cliente',
+            {'dni':self.cliente[0]}
+        )
+        self.id_cliente = self.id_cliente[0][0]
 
         #Crear la interfaz
         self.info_cliente_frame()
@@ -37,13 +45,13 @@ class InfoCliente(ctk.CTkToplevel):
         )
         self.info_frame.grid(row=0, column=0, pady=25, padx=25)
 
-        # Obtenemos los campos y excluimos Id Cliente
-        self.campos_cliente = self.gestor_campos.get_campos("cliente")[1:]  # excluimos 'Id Cliente'
-        self.info_frame.stringvars = {}  # Diccionario para guardar los StringVar
+        self.campos_cliente = self.gestor_campos.get_campos("cliente")[1:]  
+        self.info_frame.stringvars = {}  
+        self.entries_list = []
 
         for idx, campo in enumerate(self.campos_cliente):
-            row = idx // 2 * 2       # Cada 2 campos, bajamos 2 filas
-            col = idx % 2            # columna 0 o 1
+            row = idx // 2 * 2       
+            col = idx % 2            
 
             # Label
             ctk.CTkLabel(
@@ -72,21 +80,23 @@ class InfoCliente(ctk.CTkToplevel):
             entry_pady = (5,25) if idx == len(self.campos_cliente)-1 else (5,0)
             entry.grid(row=row+1, column=col, padx=25, pady=entry_pady, sticky='w')
 
+            self.entries_list.append(entry)
+
             sv.set(value)
 
             # Botón "Aceptar" al final
             if idx == len(self.campos_cliente)-1:
-                boton_aceptar = ctk.CTkButton(
+                self.boton_aceptar = ctk.CTkButton(
                     master=self.info_frame,
                     text="Aceptar",
                     width=150,
                     height=45,
                     corner_radius=0,
-                    command=self.destroy,
+                    command=self.aceptar_cambios,
                     state='disabled'
                 )
                 # Lo colocamos a la derecha del último Entry
-                boton_aceptar.grid(row=row+1, column=col+1, padx=25, pady=(5,25), sticky='w')
+                self.boton_aceptar.grid(row=row+1, column=col+1, padx=25, pady=(5,25), sticky='w')
 
     def acciones_cliente_frame(self):
         self.acciones_frame=ctk.CTkFrame(
@@ -102,7 +112,8 @@ class InfoCliente(ctk.CTkToplevel):
             width=150,
             height=45,
             text='Editar',
-            corner_radius=0
+            corner_radius=0,
+            command=self.editar_cliente
         )
         self.acciones_frame.modificar_btn.grid(row=0,column=0, pady=(58,0), padx=25)
 
@@ -132,3 +143,62 @@ class InfoCliente(ctk.CTkToplevel):
             corner_radius=0
         )
         self.acciones_frame.eliminar_btn.grid(row=3,column=0, pady=(43,0), padx=25)
+
+    # ---------------------------------------------------------------------
+    # --------------------- FUNCIONALIDAD ---------------------------------
+    # ---------------------------------------------------------------------
+    def editar_cliente(self):
+        #Habilitar entries y el boton
+        for entry in self.entries_list:
+            entry.configure(state='normal')
+        self.boton_aceptar.configure(state='normal')
+    
+    def aceptar_cambios(self):
+        #Crear lista de los nuevos campos del cliente
+        self.cliente_actualizado=[]
+        for entry in self.entries_list:
+            self.cliente_actualizado.append(entry.get())
+        self.cliente_actualizado.append(self.id_cliente)
+
+        #Actualizar cliente
+        bandera_cliente=self.gestor_campos.update(
+            table='cliente',
+            values=self.cliente_actualizado
+        )
+
+        #deshabilitar botones
+        for entry in self.entries_list:
+            entry.configure(state='disabled')
+        self.boton_aceptar.configure(state='disabled')
+
+        #verificar messagebox
+        if bandera_cliente:
+            self.aceptar_msg=CTkMessagebox(
+                master=self,
+                title='Información',
+                message='Cliente actualizado exitosamente',
+                option_1='Aceptar'
+            )
+            self.cliente_actualizado.pop()
+            
+            #Actualizar fila de la tabla
+            for i, campo in enumerate(self.cliente_actualizado):
+                self.table.insert(row=self.row_cliente, column=i, value=campo)
+        
+        else:
+            self.error_msg=CTkMessagebox(
+                master=self,
+                title='Error',
+                message='Error actualizando al cliente',
+                option_1='Aceptar',
+                icon='error'
+            )
+
+    def ver_cuenta(self):
+        pass
+
+    def ver_contratos(self):
+        pass
+
+    def dar_de_baja(self):
+        pass

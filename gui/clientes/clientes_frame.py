@@ -4,7 +4,7 @@ from PIL import Image
 from CTkXYFrame import CTkXYFrame
 from CTkTable import CTkTable
 from db.gestor_campos import GestorCampos
-from gui.cliente_info_window import InfoCliente
+from gui.clientes.cliente_info_window import InfoCliente
 
 
 class ClientesFrame(ctk.CTkFrame):
@@ -65,7 +65,7 @@ class ClientesFrame(ctk.CTkFrame):
             fg_color="#D9D9D9",
             hover_color="#BFBFBF",
             text_color="white",
-            # command=self.nuevo_cliente
+            command=self.nuevo_cliente
         )
         nuevo_btn.grid(row=0, column=2, padx=(0, 25), pady=5, sticky="e")
 
@@ -174,11 +174,12 @@ class ClientesFrame(ctk.CTkFrame):
 
     def nuevo_cliente(self):
         """Abre la ventana para crear un nuevo cliente."""
-        from gui.nuevo_cliente_window import NuevoCliente
+        from gui.clientes.nuevo_cliente_window import NuevoCliente
         NuevoCliente().mainloop()
 
     def info_cliente(self, info):
         """LLama a la clase InfoCliente para mostrar todas las opciones posibles a realizarle."""
         cliente = self.table.get_row(info["row"])
+        row_cliente=info["row"]
 
-        info_cliente = InfoCliente(cliente=cliente)
+        info_cliente = InfoCliente(cliente=cliente, table=self.table, row_cliente=row_cliente)

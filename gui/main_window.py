@@ -1,9 +1,14 @@
 from gui.menu_frame import MenuFrame
 from gui.inicio_frame import InicioFrame
-from gui.clientes_frame import ClientesFrame
+from gui.clientes.clientes_frame import ClientesFrame
+from gui.empleados.empleados_frame import EmpleadosFrame
+from gui.equipos.equipos_frame import EquiposFrame
+
 from db.gestor_campos import GestorCampos
+
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
+
 GestorCamposInstance = GestorCampos()
 
 class MainWindow(ctk.CTkToplevel):
@@ -24,9 +29,9 @@ class MainWindow(ctk.CTkToplevel):
             "inicio": self.show_inicio,
             "clientes": self.show_clientes,
             # "soporte": self.show_soporte,
-            # "empleados": self.show_empleados,
+            "empleados": self.show_empleados,
             # "pago": self.show_pago,
-            # "equipos": self.show_equipos,
+            "equipos": self.show_equipos,
             "log_out": self.log_out
         }
 
@@ -41,6 +46,12 @@ class MainWindow(ctk.CTkToplevel):
 
     def show_clientes(self):
         self._show_frame(ClientesFrame, user=self.user)
+    
+    def show_empleados(self):
+        self._show_frame(EmpleadosFrame, user=self.user)
+    
+    def show_equipos(self):
+        self._show_frame(EquiposFrame, user=self.user)
 
     # ... métodos similares para soporte, empleados, etc.
 

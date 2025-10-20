@@ -16,6 +16,7 @@ class GestorTablas:
                         telefono TEXT,
                         direccion TEXT NOT NULL,
                         fecha_alta DATE NOT NULL,
+                        fecha_baja DATE NULL,
                         estado_servicio TEXT NOT NULL CHECK(estado_servicio IN ('activo', 'suspendido', 'cortado', 'baja'))
                     )
                 """,

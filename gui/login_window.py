@@ -74,6 +74,7 @@ class LoginWindow(ctk.CTkToplevel):
         self.dni_entry.grid(row=3, column=0, padx=25, pady=(5, 0), sticky="we")
         self.dni_entry.bind("<Return>", lambda event: self.contrasena_entry.focus_set())
         self.dni_entry.bind("<Down>", lambda event: self.contrasena_entry.focus_set())
+        self.dni_entry.focus_set()
 
         ctk.CTkLabel(
             master=self.login_frame,
