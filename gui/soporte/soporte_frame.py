@@ -1,14 +1,13 @@
-import threading
 import customtkinter as ctk
 from PIL import Image
+from db.gestor_campos import GestorCampos
 from CTkXYFrame import CTkXYFrame
 from CTkTable import CTkTable
-from db.gestor_campos import GestorCampos
-from gui.clientes.cliente_info_window import InfoCliente
+from soporte_info_window import TicketInfo
+import threading
 
-
-class ClientesFrame(ctk.CTkFrame):
-    """Frame principal para la gestión de clientes."""
+class SoporteFrame(ctk.CTkFrame):
+    """Frame principal para la gestión de soporte (tickets)."""
 
     def __init__(self, master, user, **kwargs):
         super().__init__(master, **kwargs)
@@ -18,15 +17,12 @@ class ClientesFrame(ctk.CTkFrame):
 
         # Instancias y variables
         self.gestor_campos = GestorCampos()
-        self.campos_cliente = self.gestor_campos.get_campos("cliente")
-        self._filtro_timer = None
-        self._fila_popup_actual = None
-        self._datos_fila_popup = None
+        self.campos_tickets = self.gestor_campos.get_campos('tickets_soporte')
 
         # Construcción de la interfaz
         self._crear_submenu()
         self._crear_contenido()
-
+        
     # ---------------------------------------------------------------------
     # --------------------- CREACIÓN DE INTERFAZ --------------------------
     # ---------------------------------------------------------------------
@@ -65,7 +61,7 @@ class ClientesFrame(ctk.CTkFrame):
             fg_color="#D9D9D9",
             hover_color="#BFBFBF",
             text_color="white",
-            command=self.nuevo_cliente
+            #command=self.nuevo_ticket
         )
         nuevo_btn.grid(row=0, column=2, padx=(0, 25), pady=5, sticky="e")
 
@@ -86,7 +82,7 @@ class ClientesFrame(ctk.CTkFrame):
         entries_frame = ctk.CTkFrame(self.content_frame, corner_radius=0, fg_color="black", height=45)
         entries_frame.grid(row=0, column=0, sticky="ew")
 
-        for i, campo in enumerate(self.campos_cliente[1:]):  # Excluye el ID
+        for i, campo in enumerate(self.campos_tickets):  # Excluye el ID
             entry = ctk.CTkEntry(
                 entries_frame,
                 font=("Lato Light", 16),
@@ -99,23 +95,23 @@ class ClientesFrame(ctk.CTkFrame):
                 text_color="black",
                 placeholder_text_color="gray"
             )
-            padx = (0, 1) if i == 0 else (1, 0) if i == len(self.campos_cliente[1:]) - 1 else 1
+            padx = (0, 1) if i == 0 else (1, 0) if i == len(self.campos_tickets) - 1 else 1
             entry.grid(row=0, column=i, padx=padx, pady=0)
             entry.bind("<KeyRelease>", self._filtrar_tabla)
             self.entries[campo] = entry
 
     def _crear_tabla(self):
-        """Crea la tabla de datos de clientes."""
+        """Crea la tabla de datos de tickets."""
         table_frame = ctk.CTkFrame(self.content_frame, corner_radius=0, fg_color="black", height=45)
         table_frame.grid(row=1, column=0, sticky="nsew")
 
         # Cargar datos
-        raw_data = self.gestor_campos.read(table="cliente", where={})
-        self._datos_originales = [list(row[1:]) for row in raw_data]  # Excluir id_cliente
+        raw_data = self.gestor_campos.read(table="tickets_soporte", where={})
+        self._datos_originales = [list(row[1:]) for row in raw_data]
         self._datos_filtrados = list(self._datos_originales)
 
         rows = len(self._datos_originales)
-        cols = len(self.campos_cliente) - 1
+        cols = len(self.campos_tickets)
 
         self.table = CTkTable(
             master=table_frame,
@@ -130,7 +126,7 @@ class ClientesFrame(ctk.CTkFrame):
             text_color="black",
             pady=1,
             cursor="hand2",
-            command=self.info_cliente
+            #command=self.info_cliente
         )
         self.table.grid(row=0, column=0, sticky="nsew")
 
@@ -145,7 +141,7 @@ class ClientesFrame(ctk.CTkFrame):
 
         self._filtro_timer = threading.Timer(0.25, self._ejecutar_filtrado)
         self._filtro_timer.start()
-
+    
     def _ejecutar_filtrado(self):
         """Aplica los filtros ingresados en los campos."""
         filtros = [e.get().strip().lower() for e in self.entries.values()]
@@ -166,20 +162,11 @@ class ClientesFrame(ctk.CTkFrame):
     def _actualizar_tabla(self, nuevos_datos):
         """Actualiza los valores de la tabla."""
         filas_max = len(self._datos_originales)
-        cols = len(self.campos_cliente) - 1
+        cols = len(self.campos_tickets) - 1
 
         # Rellenar filas vacías si hay menos resultados
         nuevos_datos += [[""] * cols for _ in range(filas_max - len(nuevos_datos))]
         self.table.update_values(nuevos_datos)
-
-    def nuevo_cliente(self):
-        """Abre la ventana para crear un nuevo cliente."""
-        from gui.clientes.nuevo_cliente_window import NuevoCliente
-        NuevoCliente().mainloop()- 
-
-    def info_cliente(self, info):
-        """LLama a la clase InfoCliente para mostrar todas las opciones posibles a realizarle."""
-        cliente = self.table.get_row(info["row"])
-        row_cliente=info["row"]
-
-        info_cliente = InfoCliente(cliente=cliente, table=self.table, row_cliente=row_cliente)
+    
+    def info_ticket(self):
+        

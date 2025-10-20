@@ -3,6 +3,7 @@ from gui.inicio_frame import InicioFrame
 from gui.clientes.clientes_frame import ClientesFrame
 from gui.empleados.empleados_frame import EmpleadosFrame
 from gui.equipos.equipos_frame import EquiposFrame
+from gui.soporte.soporte_frame import SoporteFrame
 
 from db.gestor_campos import GestorCampos
 
@@ -28,7 +29,7 @@ class MainWindow(ctk.CTkToplevel):
         callbacks = {
             "inicio": self.show_inicio,
             "clientes": self.show_clientes,
-            # "soporte": self.show_soporte,
+            "soporte": self.show_soporte,
             "empleados": self.show_empleados,
             # "pago": self.show_pago,
             "equipos": self.show_equipos,
@@ -52,6 +53,9 @@ class MainWindow(ctk.CTkToplevel):
     
     def show_equipos(self):
         self._show_frame(EquiposFrame, user=self.user)
+    
+    def show_soporte(self):
+        self._show_frame(SoporteFrame, user=self.user)
 
     # ... métodos similares para soporte, empleados, etc.
 

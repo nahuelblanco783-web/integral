@@ -1,7 +1,6 @@
 import customtkinter as ctk
 from db.gestor_campos import GestorCampos
 from CTkMessagebox import CTkMessagebox
-ctk.set_appearance_mode("light")
 
 class InfoCliente(ctk.CTkToplevel):
     """ Toplevel para mostrar toda la información del cliente y las acciones posibles (modificar, dar de baja y/o ver cuenta)"""

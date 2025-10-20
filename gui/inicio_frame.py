@@ -19,12 +19,12 @@ class InicioFrame(ctk.CTkFrame):
             master=self,
             image=integral_image,
             text=''
-        ).pack(side='top',pady=(200,0))
+        ).grid(row=0, column=0, sticky='nsew')
         
         ctk.CTkLabel(
             master=self,
             text='Bienvenid@, '+self.user[2],
             text_color='black',
             font=('Lato Light', 32)
-        ).pack(pady=(25,0))
+        ).grid(row=1, column=0)
 

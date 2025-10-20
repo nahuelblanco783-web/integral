@@ -20,28 +20,57 @@ class GestorCampos:
             })
         return columnas
 
-    def create(self, table: str, values: list[Any]) -> bool:
-        """Inserta un registro en la tabla indicada usando solo una lista de valores."""
+    def create(self, table: str, values: list[Any] | dict[str, Any]) -> bool:
+        """
+        Inserta un registro en la tabla indicada.
+        - Si se pasa una lista: se asume orden según columnas (NO RECOMENDADO si hay campos opcionales).
+        - Si se pasa un dict: se insertan solo las columnas especificadas.
+        - Respeta DEFAULT y NULL según corresponda.
+        """
         try:
-            columnas_info = self._obtener_columnas(table)
-            columnas = [
-                c["name"] for c in columnas_info
-                if not (c["pk"] and "INT" in c["type"])
+            # Obtener info de columnas extendida
+            with conexion_cursor(self.nombre_bd) as (_conn, cursor):
+                cursor.execute(f"PRAGMA table_xinfo({table})")
+                columnas_ext = cursor.fetchall()
+
+            columnas_insertables = [
+                c for c in columnas_ext
+                if not (c[5] == 1 and "INT" in (c[2] or "").upper())  # evitar PK INT AUTOINCREMENT
             ]
 
-            if len(columnas) != len(values):
-                raise ValueError(
-                    f"La cantidad de valores ({len(values)}) no coincide con las columnas ({len(columnas)}): {columnas}"
-                )
+            columnas_nombres = [c[1] for c in columnas_insertables]
+            columnas_not_null = {c[1] for c in columnas_insertables if c[3] == 1 and c[4] is None}
 
-            keys = ', '.join(columnas)
-            placeholders = ', '.join(['?' for _ in values])
+            # --- Caso 1: Diccionario ---
+            if isinstance(values, dict):
+                # Validar que no falten columnas NOT NULL sin default
+                faltantes = columnas_not_null - set(values.keys())
+                if faltantes:
+                    raise ValueError(f"Faltan columnas obligatorias (NOT NULL sin default): {faltantes}")
+
+                columnas_a_insertar = list(values.keys())
+                valores_a_insertar = list(values.values())
+
+            # --- Caso 2: Lista ---
+            else:
+                if len(values) > len(columnas_nombres):
+                    raise ValueError(f"Demasiados valores ({len(values)}) para columnas ({len(columnas_nombres)})")
+
+                # Rellenar con None solo si faltan valores
+                valores_a_insertar = list(values) + [None] * (len(columnas_nombres) - len(values))
+                columnas_a_insertar = columnas_nombres[:len(valores_a_insertar)]
+
+            # Armar la query final
+            keys = ', '.join(columnas_a_insertar)
+            placeholders = ', '.join(['?' for _ in columnas_a_insertar])
             sql_query = f"INSERT INTO {table} ({keys}) VALUES ({placeholders})"
 
             with conexion_cursor(self.nombre_bd) as (conn, cursor):
-                cursor.execute(sql_query, tuple(values))
+                cursor.execute(sql_query, tuple(valores_a_insertar))
                 conn.commit()
+
             return True
+
         except Exception as e:
             print(f"Error al insertar en {table}: {e}")
             return False
