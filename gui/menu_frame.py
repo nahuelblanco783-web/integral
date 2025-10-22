@@ -60,7 +60,8 @@ class MenuFrame(ctk.CTkFrame):
         self.account_button = ctk.CTkButton(
             self, text=str(self.user[2]).upper(), height=35, width=0,
             fg_color="#242423", hover_color="#4E4E4E", text_color="white",
-            font=('Lato Light', 20), corner_radius=0, cursor="hand2"
+            font=('Lato Light', 20), corner_radius=0, cursor="hand2",
+            state='disabled'
         )
 
         self.log_out_image = ctk.CTkImage(

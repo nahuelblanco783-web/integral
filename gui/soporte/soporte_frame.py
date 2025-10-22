@@ -342,7 +342,7 @@ class SoporteFrame(ctk.CTkFrame):
         card_frame.id_empleado = tecnico[0]
         card_frame.nombre = tecnico[2]
         card_frame.tickets_asignados = tickets_asignados
-        card_frame.id_rol_base = tecnico[7]  # Guardar el rol para filtrado
+        card_frame.id_rol_base = tecnico[11]  # Guardar el rol para filtrado
 
         # Evento de clic para selección
         def seleccionar_tecnico(event):
