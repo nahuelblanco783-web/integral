@@ -4,6 +4,9 @@ from gui.clientes.clientes_frame import ClientesFrame
 from gui.empleados.empleados_frame import EmpleadosFrame
 from gui.equipos.equipos_frame import EquiposFrame
 from gui.soporte.soporte_frame import SoporteFrame
+from gui.pago.pago_frame import PagoFrame
+
+
 
 from db.gestor_campos import GestorCampos
 
@@ -31,7 +34,7 @@ class MainWindow(ctk.CTkToplevel):
             "clientes": self.show_clientes,
             "soporte": self.show_soporte,
             "empleados": self.show_empleados,
-            # "pago": self.show_pago,
+            "pago": self.show_pago,
             "equipos": self.show_equipos,
             "log_out": self.log_out
         }
@@ -56,6 +59,9 @@ class MainWindow(ctk.CTkToplevel):
     
     def show_soporte(self):
         self._show_frame(SoporteFrame, user=self.user)
+    
+    def show_pago(self):
+        self._show_frame(PagoFrame, user=self.user)
 
     # ... métodos similares para soporte, empleados, etc.
 
@@ -82,6 +88,14 @@ class MainWindow(ctk.CTkToplevel):
             from gui.login_window import LoginWindow
             login_app = LoginWindow(master=self.master)
             login_app.focus()
+            
+    # main_window.py
+    def _show_frame(self, frame_class, *args, **kwargs):
+        if self.current_frame is not None:
+            self.current_frame.pack_forget()
+            self.current_frame.destroy()  # Añadir esta línea
+        self.current_frame = frame_class(self, *args, **kwargs)
+        self.current_frame.pack(fill="both", expand=True)
 
     def on_close(self):
         self.destroy()    # destruye la ventana

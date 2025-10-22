@@ -31,9 +31,9 @@ class EquiposFrame(ctk.CTkFrame):
         
         # Identificar columnas especiales
         self.columnas_fecha = [campo for campo in self.campos_visibles 
-                              if any(palabra in campo.lower() for palabra in ['fecha', 'date'])]
+                               if any(palabra in campo.lower() for palabra in ['fecha', 'date'])]
         self.columnas_estado = [campo for campo in self.campos_visibles 
-                               if any(palabra in campo.lower() for palabra in ['estado', 'state', 'status'])]
+                                if any(palabra in campo.lower() for palabra in ['estado', 'state', 'status'])]
         
         # Valores posibles para el estado (se detectarán automáticamente)
         self.estados_posibles = ["Todos"]
@@ -114,8 +114,8 @@ class EquiposFrame(ctk.CTkFrame):
             # Frame para cada columna
             col_frame = ctk.CTkFrame(entries_frame, fg_color="white", corner_radius=0)
             col_frame.grid(row=0, column=i, 
-                          padx=(0, 1) if i == 0 else (1, 0) if i == len(self.campos_visibles) - 1 else 1, 
-                          pady=0, sticky="nsew")
+                           padx=(0, 1) if i == 0 else (1, 0) if i == len(self.campos_visibles) - 1 else 1, 
+                           pady=0, sticky="nsew")
 
             # Para columnas de estado, usar combobox
             if campo in self.columnas_estado:
@@ -227,7 +227,7 @@ class EquiposFrame(ctk.CTkFrame):
         try:
             if not self.columnas_estado:
                 return
-                
+            
             columna_estado = self.columnas_estado[0]  # Tomar la primera columna de estado
             indice_columna = self.campos_visibles.index(columna_estado)
             
@@ -246,7 +246,7 @@ class EquiposFrame(ctk.CTkFrame):
                 # Actualizar el combobox si existe
                 if columna_estado in self.comboboxes:
                     self.comboboxes[columna_estado].configure(values=self.estados_posibles)
-                    
+            
         except Exception as e:
             print(f"Error detectando estados únicos: {e}")
 

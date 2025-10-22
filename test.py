@@ -12,14 +12,18 @@ gc = GestorCampos()
 #     }
 # )
 gc.create(
-    table='cliente',
+    table='empleado',
     values=[
-        '3214',
+        '3',
+        '2',
         'juanito',
         'email@email.con',
         '55',
         'nose',
         '2025-5-5',
-        'activo'
+        'activo',
+        '',
+        '',
+        '3',
     ]
 )

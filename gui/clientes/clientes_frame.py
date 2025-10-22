@@ -175,7 +175,7 @@ class ClientesFrame(ctk.CTkFrame):
     def nuevo_cliente(self):
         """Abre la ventana para crear un nuevo cliente."""
         from gui.clientes.nuevo_cliente_window import NuevoCliente
-        NuevoCliente().mainloop()- 
+        NuevoCliente().mainloop()
 
     def info_cliente(self, info):
         """LLama a la clase InfoCliente para mostrar todas las opciones posibles a realizarle."""

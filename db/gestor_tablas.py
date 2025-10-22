@@ -202,6 +202,20 @@ class GestorTablas:
                         FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
                     )
                 """
+                ,
+                "pasarelas_pago": """
+                    CREATE TABLE IF NOT EXISTS pasarelas_pago (
+                        id_pasarela INTEGER PRIMARY KEY AUTOINCREMENT,
+                        nombre TEXT NOT NULL UNIQUE,
+                        proveedor TEXT NOT NULL,
+                        api_key TEXT,
+                        api_secret TEXT,
+                        modo_prueba BOOLEAN NOT NULL DEFAULT 1,
+                        activo BOOLEAN NOT NULL DEFAULT 1,
+                        configuracion TEXT,
+                        fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """
             }
             
             for table_name, create_query in tables_dict.items():

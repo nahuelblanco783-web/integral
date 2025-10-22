@@ -90,10 +90,9 @@ class GestorCampos:
             print(f"Error al leer de {table}: {e}")
             return []
 
-    def update(self, table: str, values: list[Any]) -> bool:
+    def update(self, table: str, values: list[Any] | dict[str, Any]) -> bool:
         """
-        Actualiza un registro usando solo una lista de valores.
-        La última posición de la lista corresponde al valor de la clave primaria.
+        Actualiza un registro usando una lista de valores O un diccionario.
         """
         try:
             columnas_info = self._obtener_columnas(table)
@@ -101,22 +100,42 @@ class GestorCampos:
             if pk_col is None:
                 raise ValueError(f"La tabla {table} no tiene clave primaria definida.")
 
-            columnas = [c["name"] for c in columnas_info if c["name"] != pk_col]
-            if len(values) != len(columnas) + 1:
-                raise ValueError(
-                    f"La cantidad de valores ({len(values)}) no coincide con columnas+PK ({len(columnas) + 1}): {columnas + [pk_col]}"
-                )
+            # --- Caso 1: Diccionario ---
+            if isinstance(values, dict):
+                if pk_col not in values:
+                    raise ValueError(f"Falta la clave primaria '{pk_col}' en el diccionario")
+                
+                # Separar la PK del resto de valores
+                pk_value = values[pk_col]
+                valores_actualizacion = {k: v for k, v in values.items() if k != pk_col}
+                
+                if not valores_actualizacion:
+                    raise ValueError("No hay valores para actualizar")
+                    
+                set_clause = ', '.join([f"{col}=?" for col in valores_actualizacion.keys()])
+                sql_query = f"UPDATE {table} SET {set_clause} WHERE {pk_col}=?"
+                params = list(valores_actualizacion.values()) + [pk_value]
 
-            set_clause = ', '.join([f"{col}=?" for col in columnas])
-            sql_query = f"UPDATE {table} SET {set_clause} WHERE {pk_col}=?"
+            # --- Caso 2: Lista ---
+            else:
+                columnas = [c["name"] for c in columnas_info if c["name"] != pk_col]
+                if len(values) != len(columnas) + 1:
+                    raise ValueError(f"La cantidad de valores no coincide")
 
-            params = values  # valores + pk al final
+                set_clause = ', '.join([f"{col}=?" for col in columnas])
+                sql_query = f"UPDATE {table} SET {set_clause} WHERE {pk_col}=?"
+                params = values
+
+            print(f"📝 Ejecutando UPDATE: {sql_query} con params: {params}")
+            
             with conexion_cursor(self.nombre_bd) as (conn, cursor):
                 cursor.execute(sql_query, tuple(params))
                 conn.commit()
+            
             return True
+            
         except Exception as e:
-            print(f"Error al actualizar en {table}: {e}")
+            print(f"❌ Error al actualizar en {table}: {e}")
             return False
 
     def delete(self, table: str, where: dict[str, Any]) -> bool:

@@ -62,7 +62,7 @@ class EmpleadosFrame(ctk.CTkFrame):
             fg_color="#D9D9D9",
             hover_color="#BFBFBF",
             text_color="white",
-            #command=self.nuevo_cliente
+            command=self.nuevo_empleado
         )
         nuevo_btn.grid(row=0, column=2, padx=(0, 25), pady=5, sticky="e")
 
@@ -169,10 +169,10 @@ class EmpleadosFrame(ctk.CTkFrame):
         nuevos_datos += [[""] * cols for _ in range(filas_max - len(nuevos_datos))]
         self.table.update_values(nuevos_datos)
 
-    def nuevo_cliente(self):
+    def nuevo_empleado(self):
         """Abre la ventana para crear un nuevo cliente."""
-        from gui.clientes.nuevo_cliente_window import NuevoCliente
-        NuevoCliente().mainloop()
+        from gui.empleados.nuevo_empleado_window import NuevoEmpleado
+        NuevoEmpleado().mainloop()
 
     def info_empleado(self, info):
         """LLama a la clase InfoCliente para mostrar todas las opciones posibles a realizarle."""
