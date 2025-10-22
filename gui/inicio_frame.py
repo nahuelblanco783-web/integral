@@ -49,8 +49,4 @@ class InicioFrame(ctk.CTkFrame):
         self.integral_image.configure(size=(new_size, new_size))
 
         # Actualizar la etiqueta para redibujar
-<<<<<<< HEAD
         self.image_label.configure(image=self.integral_image)
-=======
-        self.image_label.configure(image=self.integral_image)
->>>>>>> 44b473e40686537bb321763d5e23235f9e6abf27
